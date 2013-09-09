@@ -1,15 +1,11 @@
-function checkImage(testUrl) { 
+function checkImage(testUrl) {
     var http = jQuery.ajax({
         type: "HEAD",
         url: testUrl,
         async: false
     });
 
-    if (http.status == 200) {
-        return true;
-    } else {
-        return false;
-    }
+   return http.status == 200;
 }
 
 
