@@ -1,50 +1,97 @@
-function checkImage(testUrl) {
-    var http = jQuery.ajax({
-        type: "HEAD",
-        url: testUrl,
-        async: false
-    });
+/*!
+ *  imgSwap v0.2.0
+ *  Responsive image solution
+ *  Project: https://github.com/darbybrown/imgswap
+ *  by Hugo Darby-Brown: http://darbybrown.com
+ *  Copyright. MIT licensed.
+ */
 
-   return http.status == 200;
-}
+window.imgSwap = (function (window, document, undefined) {
 
+    'use strict';
 
-function imgSwap() {
-
-    var images = $('img[data-swap]'); 
-
-
-    for (var i = 0; i < images.length; i++) {
-
-        var imageFormat = images[i].src.substr(-4);
-        var imageName = images[i].src.substr(0, images[i].src.length - 7);
-        var sml = imageName + "sml" + imageFormat;
-        var med = imageName + "med" + imageFormat;
-        var lrg = imageName + "lrg" + imageFormat;
+    var store = [],
+        selector, medium, large, imageSuffix, sml, med, lrg, throttle, poll;
 
 
-        if (window.devicePixelRatio > 1) { 
-            if ($(window).width() > 480 && checkImage(lrg)) {
-                imageName = lrg;
+    var _checkImage = function (url) {
+        var img = new Image();
+        img.src = url;
+        return img.height !== 0;
+    };
+    
+
+
+    var _changeSource = function () {
+        for (var i = store.length; i--;) {
+            var self = store[i];
+            
+            var windowWidth = window.innerWidth || document.documentElement.clientWidth;
+            var imageFormat = "." + self.src.split('.').pop();
+
+            var parts = self.src.split('-');
+            parts.pop();
+            var imageName = parts.join('-')  + "-";
+          
+            var test =  imageName + lrg +  imageFormat;
+
+
+            if (window.devicePixelRatio > 1) {
+                imageSuffix = windowWidth > medium && _checkImage(test) ? lrg : med;
+
+            } else if (windowWidth > large && _checkImage(test)) {
+                imageSuffix = lrg;
+
+            } else if (windowWidth > medium) {
+                imageSuffix = med;
 
             } else {
-                imageName = med;
+                imageSuffix = sml;
             }
 
-        } else if ($(window).width() > 900 && checkImage(lrg)) {
-            imageName = lrg;
+            self.src = imageName + imageSuffix + imageFormat;
+        }
+    };
 
-        } else if ($(window).width() > 480) {
-            imageName = med;
-        } else {
-            imageName = sml;
+
+
+    var _throttle = function () {
+        clearTimeout(poll);
+        poll = setTimeout(_changeSource, throttle);
+    };
+
+
+
+    var init = function (obj) {
+        var opts = obj || {};
+        selector = opts.selector || '[data-swap]';
+        sml = opts.suffixes[0] || 'sml';
+        med = opts.suffixes[1] || 'med';
+        lrg = opts.suffixes[2] || 'lrg';
+        medium = opts.medium || 480;
+        large = opts.large || 900;
+        throttle = opts.throttle || 250;
+
+        var images = document.querySelectorAll(selector);
+
+        for (var i = 0; i < images.length; i++) {
+            store.push(images[i]);
         }
 
+        _changeSource();
 
-        images[i].src = imageName;
-    }
 
-}
-imgSwap();
+        if (document.addEventListener) {
+            window.addEventListener('resize', _throttle, false);
+        } else {
+            window.attachEvent('resize', _throttle);
+        }
+    };
 
-$(window).resize(function() { imgSwap(); });
+
+    return {
+        init: init
+    };
+
+
+})(window, document);
