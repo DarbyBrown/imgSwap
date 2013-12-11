@@ -84,7 +84,7 @@ window.imgSwap = (function (window, document, undefined) {
         if (document.addEventListener) {
             window.addEventListener('resize', _throttle, false);
         } else {
-            window.attachEvent('resize', _throttle);
+            window.attachEvent('onresize', _throttle);
         }
     };
 
