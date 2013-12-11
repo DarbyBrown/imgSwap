@@ -14,6 +14,7 @@ window.imgSwap = (function (window, document, undefined) {
         selector, medium, large, imageSuffix, sml, med, lrg, throttle, poll;
 
 
+    // Checks to see if an image exists
     var _checkImage = function (url) {
         var img = new Image();
         img.src = url;
@@ -27,15 +28,19 @@ window.imgSwap = (function (window, document, undefined) {
             var self = store[i];
             
             var windowWidth = window.innerWidth || document.documentElement.clientWidth;
+
+            // Gets image format
             var imageFormat = "." + self.src.split('.').pop();
 
+            // Splits the file name and removes everything after the '-' to get the base file name e.g "image-"
             var parts = self.src.split('-');
             parts.pop();
             var imageName = parts.join('-')  + "-";
-          
+            
+
             var test =  imageName + lrg +  imageFormat;
 
-
+            // the image suffix is chosen depending on screen size or pixel ratio 
             if (window.devicePixelRatio > 1) {
                 imageSuffix = windowWidth > medium && _checkImage(test) ? lrg : med;
 
@@ -49,12 +54,13 @@ window.imgSwap = (function (window, document, undefined) {
                 imageSuffix = sml;
             }
 
+            // adds it all back together 
             self.src = imageName + imageSuffix + imageFormat;
         }
     };
 
 
-
+    // Limits the amount of times the _change source function is fired
     var _throttle = function () {
         clearTimeout(poll);
         poll = setTimeout(_changeSource, throttle);
@@ -84,7 +90,7 @@ window.imgSwap = (function (window, document, undefined) {
         if (document.addEventListener) {
             window.addEventListener('resize', _throttle, false);
         } else {
-            window.attachEvent('resize', _throttle);
+            window.attachEvent('onresize', _throttle);
         }
     };
 
