@@ -26,8 +26,7 @@ Will be working on this readme soon
 		imgSwap.init({
 		    selector: '[data-swap]', 
 		    suffixes: ['sml', 'med', 'lrg'], 
-		    medium: 480,
-		    large: 900,
+		    breakpoints:[480, 900],
 		    throttle: 250
 		});
 	</script>	

@@ -74,8 +74,8 @@ window.imgSwap = (function (window, document, undefined) {
         sml = opts.suffixes[0] || 'sml';
         med = opts.suffixes[1] || 'med';
         lrg = opts.suffixes[2] || 'lrg';
-        medium = opts.medium || 480;
-        large = opts.large || 900;
+        medium = opts.breakpoints[0] || 480;
+        large = opts.breakpoints[1] || 900;
         throttle = opts.throttle || 250;
 
         var images = document.querySelectorAll(selector);
